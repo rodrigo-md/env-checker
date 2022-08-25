@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json.schemastore.org/swcrc",
+    "jsc": {
+      "parser": {
+        "syntax": "typescript",
+        "tsx": false,
+        "decorators": false,
+        "dynamicImport": false
+      },
+      "target": "es2019",
+      "baseUrl": "."
+    },
+    "module": {
+      "type": "commonjs"
+    },
+    "env": {
+      "targets": {
+        "node": "18"
+      }
+    },
+    "minify": true
+  }

@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+      "target": "es2019",
+      "module": "commonjs",
+      "allowJs": true,
+      "removeComments": true,
+      "resolveJsonModule": true,
+      "typeRoots": [
+        "./node_modules/@types"
+      ],
+      "sourceMap": true,
+      "outDir": "bin",
+      "strict": true,
+      "baseUrl": ".",
+      "forceConsistentCasingInFileNames": true,
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "skipLibCheck": true
+    },
+    "ts-node": {
+      "swc": true
+    },
+    "include": [
+      "lib/**/*"
+    ],
+    "exclude": ["node_modules", "./bin"],
+  }

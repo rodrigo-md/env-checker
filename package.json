@@ -1,0 +1,50 @@
+{
+  "name": "env-checker",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "bin": {
+    "env-checker": "./bin/index.js"
+  },
+  "description": "command-line tool to detect undocumented or scattered environment variables across your project",
+  "repository": "git@github.com:rodrigo-md/env-checker.git",
+  "author": "Rodrigo Martinez <martinez.d.rodrigo@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "JavaScript",
+    "TypeScript",
+    "env",
+    "environment",
+    "variables",
+    "linter",
+    "checker",
+    "check",
+    "devtools"
+  ],
+  "engines": {
+    "node": ">=12.10.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc --pretty --skipLibCheck --noEmit && webpack",
+    "test": "npx tap --ts",
+    "clean": "npx shx rm -rf bin",
+    "format": "rome format ."
+  },
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.242",
+    "@types/node": "^18.7.13",
+    "@types/tap": "^15.0.7",
+    "rome": "^0.8.0-next.ff4153b",
+    "shx": "^0.3.4",
+    "swc-loader": "^0.2.3",
+    "tap": "^16.3.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
+}
