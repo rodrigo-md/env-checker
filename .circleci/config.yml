@@ -1,0 +1,22 @@
+version: 2.1
+executors:
+  docker-executor:
+    docker:
+      - image: cimg/node:18.8.0
+jobs: 
+  lint_commit_messages:
+    executor: docker-executor
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yarn install --frozen-lockfile
+      - run:
+          name: Ensure commits follow conventional commits standards
+          command: npx commitlint --from=$(git --no-pager rev-list --no-merges origin/main..HEAD | tail -n 1)
+
+
+workflows:
+  linter:
+    jobs:
+      - lint_commit_messages
