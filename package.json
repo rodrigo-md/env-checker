@@ -27,7 +27,8 @@
     "build": "npm run clean && tsc --pretty --skipLibCheck --noEmit && webpack",
     "test": "npx tap --ts",
     "clean": "npx shx rm -rf bin",
-    "format": "rome format ."
+    "format": "rome format .",
+    "commit": "cz"
   },
   "dependencies": {
     "chalk": "^5.0.1",
@@ -38,6 +39,8 @@
     "@swc/core": "^1.2.242",
     "@types/node": "^18.7.13",
     "@types/tap": "^15.0.7",
+    "commitizen": "^4.2.5",
+    "cz-conventional-changelog": "3.3.0",
     "rome": "^0.8.0-next.ff4153b",
     "shx": "^0.3.4",
     "swc-loader": "^0.2.3",
@@ -46,5 +49,10 @@
     "typescript": "^4.7.4",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
