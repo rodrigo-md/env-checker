@@ -1,20 +1,21 @@
-import { Readable } from 'node:stream';
+import { Duplex } from "node:stream";
+import { promisify } from "node:util";
 
 export default class {
-    #promise: Promise<string>;
+	private chunks: string[] = [];
+	private stream: Duplex;
 
-    constructor(stream: Readable) {
-        this.#promise = new Promise(resolve => {
-            const chunks: string[] = [];
-            stream.on('data', (chunk: string) => {
-                chunks.push(chunk);
-            });
+	constructor(stream: Duplex) {
+		this.stream = stream;
 
-            stream.on('end', () => resolve(chunks.join('')));
-        })
-    }
+		this.stream.on("data", (chunk: string) => {
+			this.chunks.push(chunk);
+		});
+	}
 
-    flush(): Promise<string> {
-        return this.#promise;
-    }
+	async flush(): Promise<string> {
+		await promisify(this.stream.end.bind(this.stream))();
+
+		return this.chunks.join("");
+	}
 }
