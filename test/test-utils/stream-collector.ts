@@ -15,7 +15,6 @@ export default class {
 
 	async flush(): Promise<string> {
 		await promisify(this.stream.end.bind(this.stream))();
-
 		return this.chunks.join("");
 	}
 }

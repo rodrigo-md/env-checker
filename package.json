@@ -31,7 +31,7 @@
     "commit": "cz"
   },
   "dependencies": {
-    "chalk": "^5.0.1",
+    "chalk": "4.1.2",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
