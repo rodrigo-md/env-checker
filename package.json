@@ -28,7 +28,8 @@
     "test": "npx tap --ts",
     "clean": "npx shx rm -rf bin",
     "format": "rome format .",
-    "commit": "cz"
+    "commit": "cz",
+    "release": "npx semantic-release"
   },
   "dependencies": {
     "chalk": "4.1.2",
@@ -43,8 +44,10 @@
     "@types/tap": "^15.0.7",
     "@types/yargs": "^17.0.11",
     "commitizen": "^4.2.5",
+    "conventional-changelog-conventionalcommits": "^5.0.0",
     "cz-conventional-changelog": "3.3.0",
     "rome": "^0.8.0-next.ff4153b",
+    "semantic-release": "^19.0.5",
     "shx": "^0.3.4",
     "swc-loader": "^0.2.3",
     "tap": "^16.3.0",
