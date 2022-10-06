@@ -1,22 +1,84 @@
 version: 2.1
+orbs:
+  node: circleci/node@5.0.3
 executors:
   docker-executor:
     docker:
       - image: cimg/node:18.8.0
-jobs: 
+jobs:
   lint_commit_messages:
     executor: docker-executor
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: yarn install --frozen-lockfile
+          command: yarn install --frozen-lockfile --cache-folder ~/.npm
+      - save_cache:
+          key: node-deps-{{arch}}-v1-{{ .Branch }}-{{checksum "yarn.lock"}}
+          paths:
+            - ~/.npm
       - run:
           name: Ensure commits follow conventional commits standards
           command: npx commitlint --from=$(git --no-pager rev-list --no-merges origin/main..HEAD | tail -n 1)
+  release:
+    executor:
+      name: node/default
+      tag: 18.8.0
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          name: Build npm package
+          command: yarn build
+      - run:
+          name: Publish to npm registry and create release notes
+          command: yarn release --ci
 
 
 workflows:
-  linter:
+  # PR checks
+  checks:
     jobs:
       - lint_commit_messages
+      - node/test:
+          pkg-manager: yarn
+          version: 18.8.0
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+          filters:
+              branches:
+                ignore:
+                - main
+                - alpha
+                - beta
+                - +([0-9])?(.{+([0-9]),x}).x
+                - next
+                - next-major
+              
+  # Protected branch deployments
+  build_and_publish:
+    jobs:
+      - node/test:
+            pkg-manager: yarn
+            version: 18.8.0
+            override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+            filters:
+              branches:
+                only:
+                - main
+                - alpha
+                - beta
+                - +([0-9])?(.{+([0-9]),x}).x
+                - next
+                - next-major
+      - release:
+          requires:
+            - node/test
+          filters:
+            branches:
+              only:
+              - main
+              - alpha
+              - beta
+              - +([0-9])?(.{+([0-9]),x}).x
+              - next
+              - next-major
