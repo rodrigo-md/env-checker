@@ -26,7 +26,9 @@ jobs:
       tag: 18.8.0
     steps:
       - checkout
-      - node/install-packages
+      - node/install-packages:
+          pkg-manager: yarn
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
       - run:
           name: Build npm package
           command: yarn build
@@ -39,7 +41,16 @@ workflows:
   # PR checks
   checks:
     jobs:
-      - lint_commit_messages
+      - lint_commit_messages:
+          filters:
+                branches:
+                  ignore:
+                  - main
+                  - alpha
+                  - beta
+                  - +([0-9])?(.{+([0-9]),x}).x
+                  - next
+                  - next-major
       - node/test:
           pkg-manager: yarn
           version: 18.8.0
@@ -57,6 +68,15 @@ workflows:
   # Protected branch deployments
   build_and_publish:
     jobs:
+      - lint_commit_messages:
+          filters:
+                branches:
+                  only:
+                  - alpha
+                  - beta
+                  - +([0-9])?(.{+([0-9]),x}).x
+                  - next
+                  - next-major
       - node/test:
             pkg-manager: yarn
             version: 18.8.0
@@ -64,7 +84,6 @@ workflows:
             filters:
               branches:
                 only:
-                - main
                 - alpha
                 - beta
                 - +([0-9])?(.{+([0-9]),x}).x
@@ -73,6 +92,7 @@ workflows:
       - release:
           requires:
             - node/test
+            - lint_commit_messages
           filters:
             branches:
               only:
