@@ -1,12 +1,12 @@
 {
-  "name": "env-checker",
+  "name": "envchecker-cli",
   "version": "1.0.0",
   "main": "lib/index.js",
   "bin": {
-    "env-checker": "./bin/index.js"
+    "envchecker": "./bin/index.js"
   },
   "description": "command-line tool to detect undocumented or scattered environment variables across your project",
-  "repository": "git@github.com:rodrigo-md/env-checker.git",
+  "repository": "git@github.com:rodrigo-md/envchecker-cli.git",
   "author": "Rodrigo Martinez <martinez.d.rodrigo@gmail.com>",
   "license": "MIT",
   "keywords": [
