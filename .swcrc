@@ -15,7 +15,7 @@
     },
     "env": {
       "targets": {
-        "node": "18"
+        "node": "12.10.0"
       }
     },
     "minify": true
