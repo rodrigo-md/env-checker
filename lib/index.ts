@@ -7,7 +7,7 @@ import pkg from '../package.json'
 import { CheckCmdArgs } from './handlers/env-check-cmd';
 
 const args = yargs
-	.scriptName("env-checker")
+	.scriptName("envchecker")
 	.usage("$0 [args]")
 	.options({
 		source: {
