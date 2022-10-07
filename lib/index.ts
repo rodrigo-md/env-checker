@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { stdout } from "node:process";
 import yargs from "yargs";
 import EnvCheckCmd from "./handlers/env-check-cmd";
