@@ -26,6 +26,7 @@
   "scripts": {
     "build": "npm run clean && tsc --pretty --skipLibCheck --noEmit && webpack",
     "test": "npx tap --ts --test-ignore=e2e-tests\/.*",
+    "e2e-tests": "npx tap --ts ./e2e-tests",
     "clean": "npx shx rm -rf bin",
     "format": "rome format .",
     "commit": "cz",

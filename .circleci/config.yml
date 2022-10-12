@@ -35,6 +35,36 @@ jobs:
       - run:
           name: Publish to npm registry and create release notes
           command: yarn release --ci
+  e2e-tests:
+    parameters:
+      node-version:
+        type: string
+    executor:
+      name: node/default
+      tag: << parameters.node-version >>
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+      - run:
+          name: Run E2E tests
+          command: yarn e2e-tests
+  approval-e2e-tests:
+    parameters:
+      node-version:
+        type: string
+    executor:
+      name: node/default
+      tag: << parameters.node-version >>
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+      - run:
+          name: Run E2E tests
+          command: yarn e2e-tests
 
 
 workflows:
@@ -93,6 +123,40 @@ workflows:
           requires:
             - node/test
             - lint_commit_messages
+          filters:
+            branches:
+              only:
+              - main
+              - alpha
+              - beta
+              - +([0-9])?(.{+([0-9]),x}).x
+              - next
+              - next-major
+      - e2e-tests:
+          requires:
+            - release
+          matrix:
+            parameters:
+              node-version: ["12.10.0", "14.0.0", "14.20.1", "16.0.0", "16.17.1", "18.0.0", "18.8.0"]
+          filters:
+            branches:
+              only:
+              - main
+              - alpha
+              - beta
+              - +([0-9])?(.{+([0-9]),x}).x
+              - next
+              - next-major
+  e2e-inspection:
+    jobs:
+      - hold:
+          type: approval
+      - approval-e2e-tests:
+          requires:
+            - hold
+          matrix:
+            parameters:
+              node-version: ["12.10.0", "14.0.0", "14.20.1", "16.0.0", "16.17.1", "18.0.0", "18.8.0"]
           filters:
             branches:
               only:
