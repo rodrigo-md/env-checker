@@ -48,6 +48,9 @@ jobs:
           pkg-manager: yarn
           override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
       - run:
+          name: Install envchecker-cli package from the distribution channel matching the branch
+          command: yarn global add envchecker-cli@<< pipeline.git.branch >>
+      - run:
           name: Run E2E tests
           command: yarn e2e-tests
   approval-e2e-tests:
@@ -62,6 +65,9 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn
           override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+      - run:
+          name: Install envchecker-cli package from the distribution channel matching the branch
+          command: yarn global add envchecker-cli@<< pipeline.git.branch >>
       - run:
           name: Run E2E tests
           command: yarn e2e-tests
