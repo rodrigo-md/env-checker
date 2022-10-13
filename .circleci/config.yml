@@ -44,6 +44,8 @@ jobs:
     executor:
       name: node/default
       tag: << parameters.instalation-node-version >>
+    environment:
+      TARGET_NODE: << parameters.target-node-version >>
     steps:
       - checkout
       - node/install-packages:
@@ -58,7 +60,6 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             nvm install v<< parameters.target-node-version >>
-            nvm alias default << parameters.target-node-version >>
 
             echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
@@ -68,6 +69,11 @@ jobs:
       - run:
           name: Install envchecker-cli package from the distribution channel matching the branch
           command: yarn global add envchecker-cli@<< pipeline.git.branch >>
+      - run:
+          name: Swap node to v<<parameters.instalation-node-version>>
+          command: |
+            nvm use v<< parameters.instalation-node-version >>
+            node --version
       - run:
           name: Run E2E tests
           command: yarn e2e-tests
