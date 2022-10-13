@@ -53,7 +53,7 @@ jobs:
           name: Swap node version to << parameters.target-node-version >>
           command: |
             set +e
-            wget -q0- https://raw.githubusercontent.com/nvm-sh/v0.35.1/install.sh | bash
+            wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
@@ -62,6 +62,9 @@ jobs:
 
             echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Check node version
+          command: node --version
       - run:
           name: Install envchecker-cli package from the distribution channel matching the branch
           command: yarn global add envchecker-cli@<< pipeline.git.branch >>
