@@ -37,34 +37,31 @@ jobs:
           command: yarn release --ci
   e2e-tests:
     parameters:
-      node-version:
+      instalation-node-version:
+        type: string
+      target-node-version:
         type: string
     executor:
       name: node/default
-      tag: << parameters.node-version >>
+      tag: << parameters.instalation-node-version >>
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: yarn
           override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
       - run:
-          name: Install envchecker-cli package from the distribution channel matching the branch
-          command: yarn global add envchecker-cli@<< pipeline.git.branch >>
-      - run:
-          name: Run E2E tests
-          command: yarn e2e-tests
-  approval-e2e-tests:
-    parameters:
-      node-version:
-        type: string
-    executor:
-      name: node/default
-      tag: << parameters.node-version >>
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: yarn
-          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+          name: Swap node version to << parameters.target-node-version >>
+          command: |
+            set +e
+            wget -q0- https://raw.githubusercontent.com/nvm-sh/v0.35.1/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            nvm install v<< parameters.target-node-version >>
+            nvm alias default << parameters.target-node-version >>
+
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
           name: Install envchecker-cli package from the distribution channel matching the branch
           command: yarn global add envchecker-cli@<< pipeline.git.branch >>
@@ -143,26 +140,8 @@ workflows:
             - release
           matrix:
             parameters:
-              node-version: ["12.10.0", "14.0.0", "14.20.1", "16.0.0", "16.17.1", "18.0.0", "18.8.0"]
-          filters:
-            branches:
-              only:
-              - main
-              - alpha
-              - beta
-              - +([0-9])?(.{+([0-9]),x}).x
-              - next
-              - next-major
-  e2e-inspection:
-    jobs:
-      - hold:
-          type: approval
-      - approval-e2e-tests:
-          requires:
-            - hold
-          matrix:
-            parameters:
-              node-version: ["12.10.0", "14.0.0", "14.20.1", "16.0.0", "16.17.1", "18.0.0", "18.8.0"]
+              instalation-node-version: ["18.8.0"]
+              target-node-version: ["12.10.0", "12.22.12", "14.0.0", "14.20.1", "16.0.0", "16.18.0", "18.0.0", "18.10.0"]
           filters:
             branches:
               only:
