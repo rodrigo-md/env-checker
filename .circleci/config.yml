@@ -76,7 +76,7 @@ jobs:
           command: |
             nvm use v<< parameters.instalation-node-version >>
             node --version
-            yarn e2e-tests
+            yarn e2e-tests --test-env=TARGET_NODE=<< parameters.target-node-version>>
 
 
 workflows:

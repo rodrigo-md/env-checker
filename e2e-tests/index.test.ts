@@ -18,9 +18,10 @@ t.test(
 				}),
 			);
 
-			const envchecker = spawn('envchecker', ["--src", "constants.js", "--check-env", ".env"], {
-				argv0: `$HOME/.nvm/versions/node/v${process.env.TARGET_NODE}/bin/node`,
-				shell: true
+			const envchecker = spawn("envchecker", ["--version"], {
+                env: {
+                    PATH: `${process.env.HOME}/.nvm/versions/node/v${process.env.TARGET_NODE}/bin:${process.env.PATH}`
+                }
 			});
 
 			let stdout = "";
