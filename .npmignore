@@ -1,0 +1,13 @@
+node_modules
+test
+.circleci
+.gitignore
+.nvmrc
+.releaserc.json
+.swcrc
+commitlint.config.js
+rome.json
+tsconfig.json
+webpack.config.js
+yarn-error.log
+yarn.lock

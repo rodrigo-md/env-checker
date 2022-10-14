@@ -1,22 +1,162 @@
 version: 2.1
+orbs:
+  node: circleci/node@5.0.3
 executors:
   docker-executor:
     docker:
       - image: cimg/node:18.8.0
-jobs: 
+jobs:
   lint_commit_messages:
     executor: docker-executor
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: yarn install --frozen-lockfile
+          command: yarn install --frozen-lockfile --cache-folder ~/.npm
+      - save_cache:
+          key: node-deps-{{arch}}-v1-{{ .Branch }}-{{checksum "yarn.lock"}}
+          paths:
+            - ~/.npm
       - run:
           name: Ensure commits follow conventional commits standards
           command: npx commitlint --from=$(git --no-pager rev-list --no-merges origin/main..HEAD | tail -n 1)
+  release:
+    executor:
+      name: node/default
+      tag: 18.8.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+      - run:
+          name: Build npm package
+          command: yarn build
+      - run:
+          name: Publish to npm registry and create release notes
+          command: yarn release --ci
+  e2e-tests:
+    parameters:
+      instalation-node-version:
+        type: string
+      target-node-version:
+        type: string
+    executor:
+      name: node/default
+      tag: << parameters.instalation-node-version >>
+    environment:
+      TARGET_NODE: << parameters.target-node-version >>
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+      - run:
+          name: Swap node version to << parameters.target-node-version >>
+          command: |
+            set +e
+            wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            nvm install v<< parameters.target-node-version >>
+            nvm alias default v<< parameters.target-node-version >>
+
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Install envchecker-cli package from the distribution channel matching the branch
+          command: |
+            echo "Installing using node $(node --version)"
+            echo "global bin: $(yarn global bin)"
+            echo $PATH
+            yarn global add envchecker-cli@<< pipeline.git.branch >>
+      - run:
+          name: Switch to node v<<parameters.instalation-node-version>> and Run E2E tests
+          command: |
+            nvm use v<< parameters.instalation-node-version >>
+            node --version
+            yarn e2e-tests --test-env=TARGET_NODE=<< parameters.target-node-version>>
 
 
 workflows:
-  linter:
+  # PR checks
+  checks:
     jobs:
-      - lint_commit_messages
+      - lint_commit_messages:
+          filters:
+                branches:
+                  ignore:
+                  - main
+                  - alpha
+                  - beta
+                  - +([0-9])?(.{+([0-9]),x}).x
+                  - next
+                  - next-major
+      - node/test:
+          pkg-manager: yarn
+          version: 18.8.0
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+          filters:
+              branches:
+                ignore:
+                - main
+                - alpha
+                - beta
+                - +([0-9])?(.{+([0-9]),x}).x
+                - next
+                - next-major
+              
+  # Protected branch deployments
+  build_and_publish:
+    jobs:
+      - lint_commit_messages:
+          filters:
+                branches:
+                  only:
+                  - alpha
+                  - beta
+                  - +([0-9])?(.{+([0-9]),x}).x
+                  - next
+                  - next-major
+      - node/test:
+            pkg-manager: yarn
+            version: 18.8.0
+            override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+            filters:
+              branches:
+                only:
+                - alpha
+                - beta
+                - +([0-9])?(.{+([0-9]),x}).x
+                - next
+                - next-major
+      - release:
+          requires:
+            - node/test
+            - lint_commit_messages
+          filters:
+            branches:
+              only:
+              - main
+              - alpha
+              - beta
+              - +([0-9])?(.{+([0-9]),x}).x
+              - next
+              - next-major
+      - e2e-tests:
+          requires:
+            - release
+          matrix:
+            parameters:
+              instalation-node-version: ["18.8.0"]
+              target-node-version: ["12.10.0", "12.22.12", "14.0.0", "14.20.1", "16.0.0", "16.18.0", "18.0.0", "18.10.0"]
+          filters:
+            branches:
+              only:
+              - main
+              - alpha
+              - beta
+              - +([0-9])?(.{+([0-9]),x}).x
+              - next
+              - next-major
