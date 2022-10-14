@@ -29,7 +29,6 @@ const reporter = new CLIReporter(stdout);
 const cmd = new EnvCheckCmd(reporter);
 
 (async() => {
-	console.log('node version: ', process.version);
 	reporter.renderEmptyLine();
 	await cmd.execute(args as unknown as CheckCmdArgs);
 })();
