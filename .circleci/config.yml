@@ -68,8 +68,6 @@ jobs:
           name: Install envchecker-cli package from the distribution channel matching the branch
           command: |
             echo "Installing using node $(node --version)"
-            echo "global bin: $(yarn global bin)"
-            echo $PATH
             yarn global add envchecker-cli@<< pipeline.git.branch >>
       - run:
           name: Switch to node v<<parameters.instalation-node-version>> and Run E2E tests
@@ -114,6 +112,7 @@ workflows:
           filters:
                 branches:
                   only:
+                  - main
                   - alpha
                   - beta
                   - +([0-9])?(.{+([0-9]),x}).x
@@ -126,6 +125,7 @@ workflows:
             filters:
               branches:
                 only:
+                - main
                 - alpha
                 - beta
                 - +([0-9])?(.{+([0-9]),x}).x
