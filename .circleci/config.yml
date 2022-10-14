@@ -1,10 +1,14 @@
 version: 2.1
 orbs:
   node: circleci/node@5.0.3
+parameters:
+  node-version: 
+    type: string
+    default: "18.8.0"
 executors:
   docker-executor:
     docker:
-      - image: cimg/node:18.8.0
+      - image: cimg/node:<< pipeline.parameters.node-version >>
 jobs:
   lint_commit_messages:
     executor: docker-executor
@@ -23,7 +27,7 @@ jobs:
   release:
     executor:
       name: node/default
-      tag: 18.8.0
+      tag: << pipeline.parameters.node-version >>
     steps:
       - checkout
       - node/install-packages:
@@ -64,11 +68,24 @@ jobs:
 
             echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-      - run:
-          name: Install envchecker-cli package from the distribution channel matching the branch
-          command: |
-            echo "Installing using node $(node --version)"
-            yarn global add envchecker-cli@<< pipeline.git.branch >>
+      - when:
+          condition:
+              equal: [main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Install envchecker-cli package from the @latest distribution channel
+                command: |
+                  echo "Installing using node $(node --version)"
+                  yarn global add envchecker-cli@latest
+      - unless:
+          condition:
+              equal: [main, <<pipeline.git.branch >>]
+          steps:
+            - run:
+                name: Install envchecker-cli package from the distribution channel matching the branch
+                command: |
+                  echo "Installing using node $(node --version)"
+                  yarn global add envchecker-cli@<< pipeline.git.branch >>
       - run:
           name: Switch to node v<<parameters.instalation-node-version>> and Run E2E tests
           command: |
@@ -85,25 +102,25 @@ workflows:
           filters:
                 branches:
                   ignore:
+                    - main
+                    - alpha
+                    - beta
+                    - +([0-9])?(.{+([0-9]),x}).x
+                    - next
+                    - next-major
+      - node/test:
+          pkg-manager: yarn
+          version: << pipeline.parameters.node-version >>
+          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+          filters:
+              branches:
+                ignore:
                   - main
                   - alpha
                   - beta
                   - +([0-9])?(.{+([0-9]),x}).x
                   - next
                   - next-major
-      - node/test:
-          pkg-manager: yarn
-          version: 18.8.0
-          override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
-          filters:
-              branches:
-                ignore:
-                - main
-                - alpha
-                - beta
-                - +([0-9])?(.{+([0-9]),x}).x
-                - next
-                - next-major
               
   # Protected branch deployments
   build_and_publish:
@@ -112,25 +129,25 @@ workflows:
           filters:
                 branches:
                   only:
+                    - main
+                    - alpha
+                    - beta
+                    - +([0-9])?(.{+([0-9]),x}).x
+                    - next
+                    - next-major
+      - node/test:
+            pkg-manager: yarn
+            version: << pipeline.parameters.node-version >>
+            override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
+            filters:
+              branches:
+                only:
                   - main
                   - alpha
                   - beta
                   - +([0-9])?(.{+([0-9]),x}).x
                   - next
                   - next-major
-      - node/test:
-            pkg-manager: yarn
-            version: 18.8.0
-            override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
-            filters:
-              branches:
-                only:
-                - main
-                - alpha
-                - beta
-                - +([0-9])?(.{+([0-9]),x}).x
-                - next
-                - next-major
       - release:
           requires:
             - node/test
@@ -138,25 +155,25 @@ workflows:
           filters:
             branches:
               only:
-              - main
-              - alpha
-              - beta
-              - +([0-9])?(.{+([0-9]),x}).x
-              - next
-              - next-major
+                - main
+                - alpha
+                - beta
+                - +([0-9])?(.{+([0-9]),x}).x
+                - next
+                - next-major
       - e2e-tests:
           requires:
             - release
           matrix:
             parameters:
-              instalation-node-version: ["18.8.0"]
+              instalation-node-version: [ << pipeline.parameters.node-version >> ]
               target-node-version: ["12.10.0", "12.22.12", "14.0.0", "14.20.1", "16.0.0", "16.18.0", "18.0.0", "18.10.0"]
           filters:
             branches:
               only:
-              - main
-              - alpha
-              - beta
-              - +([0-9])?(.{+([0-9]),x}).x
-              - next
-              - next-major
+                - main
+                - alpha
+                - beta
+                - +([0-9])?(.{+([0-9]),x}).x
+                - next
+                - next-major
