@@ -1,4 +1,5 @@
 import { open } from "node:fs/promises";
+import { createReadStream } from "node:fs";
 import { EnvReaderError } from "./errors";
 import type {
 	EnvReader as Reader,
@@ -23,12 +24,18 @@ export default class EnvReader implements Reader {
 		try {
 			let buffer = "";
 			let variablesFound: string[] = [];
+			let stream;
 
-			const fd = await open(filePath);
-			const stream = fd.createReadStream({
-				encoding: "utf8",
-				highWaterMark: this.highWaterMark,
-			});
+			const fileHandler = await open(filePath);
+			// @ts-ignore
+			if (fileHandler.createReadStream) {
+				stream = fileHandler.createReadStream({
+					encoding: "utf8",
+					highWaterMark: this.highWaterMark,
+				});
+			} else {
+				stream = createReadStream('', { fd: fileHandler.fd, emitClose: true });
+			}
 
 			for await (let data of stream) {
 				const { envVariables, rest } = this.extractEnvVariablesFromStream(
@@ -40,7 +47,10 @@ export default class EnvReader implements Reader {
 			}
 
 			if (buffer.length > 0) {
-				variablesFound = [...variablesFound, ...this.extractEnvVariables(buffer)];
+				variablesFound = [
+					...variablesFound,
+					...this.extractEnvVariables(buffer),
+				];
 			}
 
 			return variablesFound;
@@ -52,21 +62,20 @@ export default class EnvReader implements Reader {
 		}
 	}
 
-	private extractEnvVariablesFromStream(data: string, previousDataRest: string) {
+	private extractEnvVariablesFromStream(
+		data: string,
+		previousDataRest: string,
+	) {
 		const content = previousDataRest + data;
 		const lastIndexNextLineChar = content.lastIndexOf("\n");
-		
+
 		const code = content.substring(0, lastIndexNextLineChar);
 
 		// * safe operation: in case LastIndexNextLineChar + 1 > content.length, substring replace it for content.length
 		// * substring(content.length, content.length) always returns an empty string
-		const rest = content.substring(
-			lastIndexNextLineChar + 1,
-			content.length,
-		);
+		const rest = content.substring(lastIndexNextLineChar + 1, content.length);
 
-		const envVariables =
-			this.extractEnvVariables(code);
+		const envVariables = this.extractEnvVariables(code);
 
 		return {
 			rest,
