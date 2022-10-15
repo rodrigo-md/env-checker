@@ -11,3 +11,4 @@ tsconfig.json
 webpack.config.js
 yarn-error.log
 yarn.lock
+e2e-tests
