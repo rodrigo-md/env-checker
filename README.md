@@ -4,8 +4,8 @@
 
 
 A command-line tool to verify that the environment variables used in your code through files like `constants.js` or `config.ts` are being documented in other files like:
-- [✓] .env.example
-- [✓] README.md
+- [x] .env.example
+- [x] README.md
 - [ ] Dockerfile (not yet)
 - [ ] docker-compose.yml (not yet)
 - [ ] helm values.yml (not yet)
