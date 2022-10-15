@@ -1,4 +1,5 @@
 import { open } from "node:fs/promises";
+import { createReadStream } from 'node:fs';
 import type {
 	EnvChecker as Checker,
 } from "../../use-cases/interfaces/env-checker";
@@ -21,12 +22,18 @@ export default class EnvChecker implements Checker {
 		try {
 			let buffer = "";
 			let variablesFound: string[] = [];
+			let stream;
 
-			const fd = await open(path);
-			const stream = fd.createReadStream({
-				encoding: "utf8",
-				highWaterMark: this.highWaterMark,
-			});
+			const fileHandler = await open(path);
+			// @ts-ignore
+			if (fileHandler.createReadStream) {
+				stream = fileHandler.createReadStream({
+					encoding: "utf8",
+					highWaterMark: this.highWaterMark,
+				});
+			} else {
+				stream = createReadStream("", { fd: fileHandler.fd, emitClose: true });
+			}
 
 			for await (let data of stream) {
 				const { envVariables, rest } = this.extractEnvVariablesFromStream(
