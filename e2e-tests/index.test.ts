@@ -20,7 +20,7 @@ t.test(
 );
 
 t.test(
-	"enchecker display a list with missing variables when aren't found",
+	"envchecker display a list with missing variables when aren't found",
 	async (t) => {
 		const { stdout, stderr } = await execCmd(
 			"envchecker --src=./test-cases/single-plain-file/constants.js --check-env=./test-cases/single-plain-file/.env.failure",
@@ -35,7 +35,7 @@ t.test(
 );
 
 t.test(
-	"enchecker display green check when all variables are documented",
+	"envchecker display green check when all variables are documented",
 	async (t) => {
 		const { stdout, stderr } = await execCmd(
 			"envchecker --src=./test-cases/single-plain-file/constants.js --check-env=./test-cases/single-plain-file/.env.success",
