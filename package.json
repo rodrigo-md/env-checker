@@ -25,7 +25,7 @@
   },
   "scripts": {
     "build": "npm run clean && tsc --pretty --skipLibCheck --noEmit && webpack",
-    "test": "npx tap --ts --test-ignore=e2e-tests\/.* --no-check-coverage",
+    "test": "npx tap --ts --test-ignore=e2e-tests/.* --no-check-coverage",
     "e2e-tests": "npx tap --ts ./e2e-tests --no-check-coverage",
     "clean": "npx shx rm -rf bin",
     "format": "rome format .",
@@ -39,6 +39,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.1.1",
     "@commitlint/config-conventional": "^17.1.0",
+    "@semantic-release/git": "^10.0.1",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.242",
     "@types/node": "^18.7.13",
