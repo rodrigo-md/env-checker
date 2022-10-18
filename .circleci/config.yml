@@ -49,12 +49,8 @@ jobs:
       TARGET_NODE: << parameters.target-node-version >>
     steps:
       - run:
-          command: git log --pretty=short -1
-      - run:
           name: Sleep 10 seconds
           command: sleep 10
-      - run:
-          command: git log --pretty=short -1
       - checkout
       - node/install-packages:
           pkg-manager: yarn
