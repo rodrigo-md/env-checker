@@ -34,9 +34,6 @@ jobs:
           pkg-manager: yarn
           override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
       - run:
-          name: Build npm package
-          command: yarn build
-      - run:
           name: Publish to npm registry and create release notes
           command: yarn release --ci
   e2e-tests:

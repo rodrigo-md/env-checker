@@ -30,7 +30,8 @@
     "clean": "npx shx rm -rf bin",
     "format": "rome format .",
     "commit": "cz",
-    "release": "npx semantic-release"
+    "release": "npx semantic-release",
+    "postversion": "yarn build"
   },
   "dependencies": {
     "chalk": "4.1.2",
