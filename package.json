@@ -1,6 +1,6 @@
 {
   "name": "envchecker-cli",
-  "version": "1.0.2-beta.1",
+  "version": "1.0.2",
   "main": "lib/index.js",
   "bin": {
     "envchecker": "./bin/index.js"
