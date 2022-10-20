@@ -171,7 +171,6 @@ workflows:
                     - main
                     - alpha
                     - beta
-                    - +([0-9])?(.{+([0-9]),x}).x
                     - next
                     - next-major
       - node/test:
@@ -184,7 +183,6 @@ workflows:
                   - main
                   - alpha
                   - beta
-                  - +([0-9])?(.{+([0-9]),x}).x
                   - next
                   - next-major
               
@@ -198,7 +196,6 @@ workflows:
                     - main
                     - alpha
                     - beta
-                    - +([0-9])?(.{+([0-9]),x}).x
                     - next
                     - next-major
       - node/test:
@@ -211,7 +208,6 @@ workflows:
                   - main
                   - alpha
                   - beta
-                  - +([0-9])?(.{+([0-9]),x}).x
                   - next
                   - next-major
       - release:
@@ -224,7 +220,6 @@ workflows:
                 - main
                 - alpha
                 - beta
-                - +([0-9])?(.{+([0-9]),x}).x
                 - next
                 - next-major
       - e2e-tests:
@@ -240,6 +235,5 @@ workflows:
                 - main
                 - alpha
                 - beta
-                - +([0-9])?(.{+([0-9]),x}).x
                 - next
                 - next-major
