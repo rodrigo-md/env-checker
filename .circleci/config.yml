@@ -104,7 +104,7 @@ jobs:
             if [ -n "$CIRCLE_TAG" ]; then
               git fetch --force --tags origin
             else
-              git fetch --force origin +refs/heads/beta:refs/remotes/origin/beta
+              git fetch --force origin +refs/heads/${CIRCLE_BRANCH}:refs/remotes/origin/${CIRCLE_BRANCH}
             fi
 
             echo "using sha1: $CIRCLE_SHA1"
