@@ -36,12 +36,6 @@ jobs:
           pkg-manager: yarn
           override-ci-command: yarn install --forzen-lockfile --cache-folder ~/.npm
       - run:
-          name: Publish to npm registry and create release notes
-          command: |
-            echo Running command on branch $GIT_BRANCH
-            yarn release --ci
-
-      - run:
           name: Store version into environment variable
           command: |
             echo export RELEASE_VERSION="$(yarn release --no-ci --dry-run | grep -oP 'The next release version is \K[0-9]+\.[0-9]+\.[0-9]+')" >> "$BASH_ENV"
@@ -49,6 +43,11 @@ jobs:
           name: Print release version
           command: |
             echo $RELEASE_VERSION
+      - run:
+          name: Publish to npm registry and create release notes
+          command: |
+            echo Running command on branch $GIT_BRANCH
+            yarn release --ci
       - when:
           condition:
             and:
@@ -76,7 +75,7 @@ jobs:
             echo $RELEASE_VERSION
             echo $RELEASE_VERSION > .version
       - save_cache:
-          key: v2-semantic-release-version-{{ .Branch }}
+          key: v3-semantic-release-version-{{ .Branch }}
           paths:
             - .version
 
@@ -94,7 +93,7 @@ jobs:
     steps:
       - restore_cache:
           keys:
-            - v2-semantic-release-version-{{ .Branch }}
+            - v3-semantic-release-version-{{ .Branch }}
       - run:
           name: Setup RELEASE_VERSION to the value stored in cache
           command: |
