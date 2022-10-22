@@ -1,6 +1,6 @@
 # Envchecker  
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
-[![circleci](https://circleci.com/gh/rodrigo-md/envchecker-cli/tree/main.svg?style=shield)](<LINK>)
+[![circleci](https://circleci.com/gh/rodrigo-md/envchecker-cli/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/rodrigo-md/envchecker-cli)
 
 
 A command-line tool to verify that the environment variables used in your code through files like `constants.js` or `config.ts` are being documented in other files like:
